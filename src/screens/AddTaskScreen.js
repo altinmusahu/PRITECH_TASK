@@ -16,7 +16,7 @@ import { useTasks } from '../hooks/useTasks';
 import { colors, spacing, radius, typography } from '../theme';
 
 export default function AddTaskScreen({ navigation }) {
-  const { addTask } = useTasks();
+  const { createTask } = useTasks();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
@@ -37,7 +37,7 @@ export default function AddTaskScreen({ navigation }) {
     if (!validate()) return;
     setSaving(true);
     try {
-      await addTask({ title, description });
+      await createTask({ title, description });
       navigation.goBack();
     } catch {
       Alert.alert('Error', 'Could not save task. Please try again.');
@@ -102,7 +102,7 @@ export default function AddTaskScreen({ navigation }) {
           <View style={styles.hint}>
             <Text style={styles.hintIcon}>💡</Text>
             <Text style={styles.hintText}>
-              New tasks start as Active. You can mark them complete from the task list.
+              New tasks start as "Not Completed". Toggle the status from the task list or detail view.
             </Text>
           </View>
         </ScrollView>

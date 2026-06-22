@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { STATUS } from '../constants';
 import { colors, typography, radius, spacing } from '../theme';
 
 export default function TaskItem({ task, onToggle, onPress, onDelete }) {
+  const isCompleted = task.status === STATUS.COMPLETED;
+
   const formattedDate = new Date(task.createdAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -13,18 +16,15 @@ export default function TaskItem({ task, onToggle, onPress, onDelete }) {
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.row}>
         <TouchableOpacity
-          style={[styles.checkbox, task.completed && styles.checkboxDone]}
+          style={[styles.checkbox, isCompleted && styles.checkboxDone]}
           onPress={onToggle}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          {task.completed && <Text style={styles.checkmark}>✓</Text>}
+          {isCompleted && <Text style={styles.checkmark}>✓</Text>}
         </TouchableOpacity>
 
         <View style={styles.content}>
-          <Text
-            style={[styles.title, task.completed && styles.titleDone]}
-            numberOfLines={1}
-          >
+          <Text style={[styles.title, isCompleted && styles.titleDone]} numberOfLines={1}>
             {task.title}
           </Text>
           {task.description ? (
@@ -34,9 +34,9 @@ export default function TaskItem({ task, onToggle, onPress, onDelete }) {
           ) : null}
           <View style={styles.footer}>
             <Text style={styles.date}>{formattedDate}</Text>
-            <View style={[styles.badge, task.completed ? styles.badgeDone : styles.badgePending]}>
-              <Text style={[styles.badgeText, task.completed ? styles.badgeTextDone : styles.badgeTextPending]}>
-                {task.completed ? 'Completed' : 'Active'}
+            <View style={[styles.badge, isCompleted ? styles.badgeDone : styles.badgePending]}>
+              <Text style={[styles.badgeText, isCompleted ? styles.badgeTextDone : styles.badgeTextPending]}>
+                {task.status}
               </Text>
             </View>
           </View>
