@@ -46,6 +46,7 @@ const DUMMY_TASKS = [
 export function useTasks() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadTasks();
@@ -66,6 +67,18 @@ export function useTasks() {
       setLoading(false);
     }
   };
+
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      if (stored) setTasks(JSON.parse(stored));
+    } catch {
+      // keep existing tasks on error
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   const persist = async (updated) => {
     setTasks(updated);
@@ -112,5 +125,5 @@ export function useTasks() {
     [tasks]
   );
 
-  return { tasks, loading, addTask, toggleTask, deleteTask, updateTask };
+  return { tasks, loading, refreshing, refresh, addTask, toggleTask, deleteTask, updateTask };
 }

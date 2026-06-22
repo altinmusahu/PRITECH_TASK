@@ -8,6 +8,7 @@ import {
   StatusBar,
   Alert,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTasks } from '../hooks/useTasks';
@@ -16,11 +17,10 @@ import TaskItem from '../components/TaskItem';
 import EmptyState from '../components/EmptyState';
 import SearchBar from '../components/SearchBar';
 import FilterBar from '../components/FilterBar';
-import QuoteCard from '../components/QuoteCard';
 import { colors, spacing, typography } from '../theme';
 
 export default function TaskListScreen({ navigation }) {
-  const { tasks, loading, toggleTask, deleteTask } = useTasks();
+  const { tasks, loading, refreshing, refresh, toggleTask, deleteTask } = useTasks();
   const { quote, loadingQuote, refreshQuote } = useQuote();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
@@ -101,7 +101,6 @@ export default function TaskListScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <>
-            <QuoteCard quote={quote} loading={loadingQuote} onRefresh={refreshQuote} />
             <SearchBar value={search} onChangeText={setSearch} onClear={() => setSearch('')} />
             <FilterBar active={filter} onChange={setFilter} counts={counts} />
           </>
@@ -119,6 +118,14 @@ export default function TaskListScreen({ navigation }) {
         }
         contentContainerStyle={filtered.length === 0 ? { flex: 1 } : { paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+          />
+        }
       />
     </SafeAreaView>
   );
