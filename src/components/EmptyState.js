@@ -2,10 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { colors, typography, spacing } from '../theme';
 
-export default function EmptyState({ icon, title, subtitle }) {
+export default function EmptyState({ title, subtitle }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{icon || '+'}</Text>
       <Text style={styles.title}>{title || 'No tasks yet'}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>
@@ -19,10 +18,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 60,
     paddingHorizontal: spacing.xl,
-  },
-  icon: {
-    fontSize: 52,
-    marginBottom: spacing.md,
   },
   title: {
     ...typography.heading,

@@ -10,6 +10,8 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTasks } from '../hooks/useTasks';
@@ -44,6 +46,7 @@ export default function AddTaskScreen({ navigation }) {
   };
 
   const handleSave = async () => {
+    Keyboard.dismiss();
     if (!validate()) return;
     setSaving(true);
     try {
@@ -60,120 +63,125 @@ export default function AddTaskScreen({ navigation }) {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={styles.sectionLabel}>Task Title *</Text>
-          <View style={[styles.inputWrap, errors.title && styles.inputError]}>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. Review pull requests"
-              placeholderTextColor={colors.textMuted}
-              value={title}
-              onChangeText={(v) => {
-                setTitle(v);
-                if (errors.title) setErrors((e) => ({ ...e, title: null }));
-              }}
-              returnKeyType="next"
-              onSubmitEditing={() => descRef.current?.focus()}
-              maxLength={80}
-              autoFocus
-            />
-          </View>
-          {errors.title ? <Text style={styles.errorText}>{errors.title}</Text> : null}
-          <Text style={styles.charCount}>{title.length}/80</Text>
-
-          <Text style={styles.sectionLabel}>Description</Text>
-          <View style={[styles.inputWrap, styles.textareaWrap, errors.description && styles.inputError]}>
-            <TextInput
-              ref={descRef}
-              style={[styles.input, styles.textarea]}
-              placeholder="Add more details about this task..."
-              placeholderTextColor={colors.textMuted}
-              value={description}
-              onChangeText={(v) => {
-                setDescription(v);
-                if (errors.description) setErrors((e) => ({ ...e, description: null }));
-              }}
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-              maxLength={400}
-              returnKeyType="done"
-            />
-          </View>
-          {errors.description ? <Text style={styles.errorText}>{errors.description}</Text> : null}
-          <Text style={styles.charCount}>{description.length}/400</Text>
-
-          <View style={styles.suggestionsHeader}>
-            <Text style={styles.sectionLabel}>Ideas From Public API</Text>
-            <TouchableOpacity onPress={refreshSuggestions} disabled={suggestionsLoading}>
-              <Text style={[styles.refreshText, suggestionsLoading && styles.refreshTextDisabled]}>
-                Refresh
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.suggestionsBox}>
-            {suggestionsLoading ? (
-              <View style={styles.suggestionsState}>
-                <ActivityIndicator color={colors.primary} size="small" />
-                <Text style={styles.suggestionsStateText}>Loading suggestions...</Text>
-              </View>
-            ) : suggestionsError ? (
-              <View style={styles.suggestionsState}>
-                <Text style={styles.suggestionsStateText}>{suggestionsError}</Text>
-                <TouchableOpacity style={styles.retryBtn} onPress={refreshSuggestions}>
-                  <Text style={styles.retryText}>Try Again</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              suggestions.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={styles.suggestion}
-                  onPress={() => applySuggestion(item.title)}
-                  activeOpacity={0.75}
-                >
-                  <Text style={styles.suggestionTitle} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.suggestionMeta}>
-                    JSONPlaceholder todo #{item.id}
-                  </Text>
-                </TouchableOpacity>
-              ))
-            )}
-          </View>
-
-          <View style={styles.hint}>
-            <Text style={styles.hintIcon}>i</Text>
-            <Text style={styles.hintText}>
-              New tasks start as "Not Completed". Toggle the status from the task list or detail view.
-            </Text>
-          </View>
-        </ScrollView>
-
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.cancelBtn} onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
-            onPress={handleSave}
-            disabled={saving}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-            {saving ? (
-              <ActivityIndicator color={colors.white} size="small" />
-            ) : (
-              <Text style={styles.saveText}>Add Task</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+            <Text style={styles.sectionLabel}>Task Title *</Text>
+            <View style={[styles.inputWrap, errors.title && styles.inputError]}>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g. Review pull requests"
+                placeholderTextColor={colors.textMuted}
+                value={title}
+                onChangeText={(v) => {
+                  setTitle(v);
+                  if (errors.title) setErrors((e) => ({ ...e, title: null }));
+                }}
+                returnKeyType="next"
+                onSubmitEditing={() => descRef.current?.focus()}
+                maxLength={80}
+                autoFocus
+              />
+            </View>
+            {errors.title ? <Text style={styles.errorText}>{errors.title}</Text> : null}
+            <Text style={styles.charCount}>{title.length}/80</Text>
+
+            <Text style={styles.sectionLabel}>Description</Text>
+            <View style={[styles.inputWrap, styles.textareaWrap, errors.description && styles.inputError]}>
+              <TextInput
+                ref={descRef}
+                style={[styles.input, styles.textarea]}
+                placeholder="Add more details about this task..."
+                placeholderTextColor={colors.textMuted}
+                value={description}
+                onChangeText={(v) => {
+                  setDescription(v);
+                  if (errors.description) setErrors((e) => ({ ...e, description: null }));
+                }}
+                multiline
+                numberOfLines={5}
+                textAlignVertical="top"
+                maxLength={400}
+                returnKeyType="done"
+                blurOnSubmit
+                onSubmitEditing={Keyboard.dismiss}
+              />
+            </View>
+            {errors.description ? <Text style={styles.errorText}>{errors.description}</Text> : null}
+            <Text style={styles.charCount}>{description.length}/400</Text>
+
+            <View style={styles.suggestionsHeader}>
+              <Text style={styles.sectionLabel}>Ideas From Public API</Text>
+              <TouchableOpacity onPress={refreshSuggestions} disabled={suggestionsLoading}>
+                <Text style={[styles.refreshText, suggestionsLoading && styles.refreshTextDisabled]}>
+                  Refresh
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.suggestionsBox}>
+              {suggestionsLoading ? (
+                <View style={styles.suggestionsState}>
+                  <ActivityIndicator color={colors.primary} size="small" />
+                  <Text style={styles.suggestionsStateText}>Loading suggestions...</Text>
+                </View>
+              ) : suggestionsError ? (
+                <View style={styles.suggestionsState}>
+                  <Text style={styles.suggestionsStateText}>{suggestionsError}</Text>
+                  <TouchableOpacity style={styles.retryBtn} onPress={refreshSuggestions}>
+                    <Text style={styles.retryText}>Try Again</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                suggestions.map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.suggestion}
+                    onPress={() => applySuggestion(item.title)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={styles.suggestionTitle} numberOfLines={2}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.suggestionMeta}>
+                      JSONPlaceholder todo #{item.id}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+
+            <View style={styles.hint}>
+              <Text style={styles.hintIcon}>i</Text>
+              <Text style={styles.hintText}>
+                New tasks start as "Not Completed". Toggle the status from the task list or detail view.
+              </Text>
+            </View>
+
+            <View style={styles.footer}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => navigation.goBack()}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
+                onPress={handleSave}
+                disabled={saving}
+              >
+                {saving ? (
+                  <ActivityIndicator color={colors.white} size="small" />
+                ) : (
+                  <Text style={styles.saveText}>Add Task</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -322,11 +330,8 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.white,
+    marginTop: spacing.lg,
+    paddingBottom: spacing.md,
   },
   cancelBtn: {
     flex: 1,

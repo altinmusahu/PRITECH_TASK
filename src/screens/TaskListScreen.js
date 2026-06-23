@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,11 @@ export default function TaskListScreen({ navigation }) {
   const { tasks, loading, refreshing, refresh, toggleStatus, deleteTask } = useTasks();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', refresh);
+    return unsubscribe;
+  }, [navigation, refresh]);
 
   const counts = useMemo(() => ({
     All: tasks.length,
@@ -56,10 +61,10 @@ export default function TaskListScreen({ navigation }) {
   };
 
   const emptyMessage = () => {
-    if (search.trim()) return { icon: '?', title: 'No results', subtitle: `No tasks match "${search}"` };
-    if (filter === STATUS.COMPLETED) return { icon: 'OK', title: 'No completed tasks', subtitle: 'Mark a task as done and it will appear here.' };
-    if (filter === STATUS.NOT_COMPLETED) return { icon: '*', title: 'All done!', subtitle: 'You have no active tasks right now.' };
-    return { icon: '+', title: 'No tasks yet', subtitle: 'Tap the + button to add your first task.' };
+    if (search.trim()) return { title: 'No results', subtitle: `No tasks match "${search}"` };
+    if (filter === STATUS.COMPLETED) return { title: 'No completed tasks', subtitle: 'Mark a task as done and it will appear here.' };
+    if (filter === STATUS.NOT_COMPLETED) return { title: 'All done!', subtitle: 'You have no active tasks right now.' };
+    return { title: 'No tasks yet', subtitle: 'Tap the + button to add your first task.' };
   };
 
   if (loading) {
@@ -110,7 +115,7 @@ export default function TaskListScreen({ navigation }) {
           />
         )}
         ListEmptyComponent={
-          <EmptyState icon={empty.icon} title={empty.title} subtitle={empty.subtitle} />
+          <EmptyState title={empty.title} subtitle={empty.subtitle} />
         }
         contentContainerStyle={filtered.length === 0 ? { flex: 1 } : { paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}

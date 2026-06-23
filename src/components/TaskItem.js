@@ -54,8 +54,6 @@ export default function TaskItem({ task, onToggle, onPress, onDelete }) {
                 </View>
               </View>
             </View>
-
-            <Text style={styles.swipeHint}>{'<'}</Text>
           </View>
         </TouchableOpacity>
       </Swipeable>
