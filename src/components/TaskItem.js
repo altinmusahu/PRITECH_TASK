@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { RectButton, Swipeable } from 'react-native-gesture-handler';
 import { STATUS } from '../constants';
 import { colors, typography, radius, spacing } from '../theme';
 
@@ -12,56 +13,78 @@ export default function TaskItem({ task, onToggle, onPress, onDelete }) {
     year: 'numeric',
   });
 
+  const renderRightActions = () => (
+    <RectButton style={styles.swipeDelete} onPress={onDelete}>
+      <Text style={styles.swipeDeleteText}>Delete</Text>
+    </RectButton>
+  );
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={[styles.checkbox, isCompleted && styles.checkboxDone]}
-          onPress={onToggle}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          {isCompleted && <Text style={styles.checkmark}>✓</Text>}
-        </TouchableOpacity>
+    <View style={styles.swipeWrap}>
+      <Swipeable
+        renderRightActions={renderRightActions}
+        overshootRight={false}
+        rightThreshold={44}
+      >
+        <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={[styles.checkbox, isCompleted && styles.checkboxDone]}
+              onPress={onToggle}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              {isCompleted && <Text style={styles.checkmark}>Y</Text>}
+            </TouchableOpacity>
 
-        <View style={styles.content}>
-          <Text style={[styles.title, isCompleted && styles.titleDone]} numberOfLines={1}>
-            {task.title}
-          </Text>
-          {task.description ? (
-            <Text style={styles.desc} numberOfLines={2}>
-              {task.description}
-            </Text>
-          ) : null}
-          <View style={styles.footer}>
-            <Text style={styles.date}>{formattedDate}</Text>
-            <View style={[styles.badge, isCompleted ? styles.badgeDone : styles.badgePending]}>
-              <Text style={[styles.badgeText, isCompleted ? styles.badgeTextDone : styles.badgeTextPending]}>
-                {task.status}
+            <View style={styles.content}>
+              <Text style={[styles.title, isCompleted && styles.titleDone]} numberOfLines={1}>
+                {task.title}
               </Text>
+              {task.description ? (
+                <Text style={styles.desc} numberOfLines={2}>
+                  {task.description}
+                </Text>
+              ) : null}
+              <View style={styles.footer}>
+                <Text style={styles.date}>{formattedDate}</Text>
+                <View style={[styles.badge, isCompleted ? styles.badgeDone : styles.badgePending]}>
+                  <Text style={[styles.badgeText, isCompleted ? styles.badgeTextDone : styles.badgeTextPending]}>
+                    {task.status}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
 
-        <TouchableOpacity
-          style={styles.deleteBtn}
-          onPress={onDelete}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Text style={styles.deleteIcon}>✕</Text>
+            <Text style={styles.swipeHint}>{'<'}</Text>
+          </View>
         </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      </Swipeable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+  swipeWrap: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.sm,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+  },
+  swipeDelete: {
+    width: 92,
+    backgroundColor: colors.danger,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swipeDeleteText: {
+    ...typography.small,
+    color: colors.white,
+    fontWeight: '800',
+  },
+  card: {
+    backgroundColor: colors.white,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -143,13 +166,10 @@ const styles = StyleSheet.create({
   badgeTextDone: {
     color: '#155724',
   },
-  deleteBtn: {
+  swipeHint: {
     marginLeft: spacing.sm,
-    padding: 4,
-  },
-  deleteIcon: {
-    fontSize: 13,
     color: colors.textMuted,
-    fontWeight: '600',
+    fontSize: 24,
+    lineHeight: 24,
   },
 });

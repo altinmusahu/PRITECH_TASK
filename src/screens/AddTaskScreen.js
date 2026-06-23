@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTasks } from '../hooks/useTasks';
+import { useTaskSuggestions } from '../hooks/useTaskSuggestions';
 import { colors, spacing, radius, typography } from '../theme';
 
 export default function AddTaskScreen({ navigation }) {
   const { createTask } = useTasks();
+  const {
+    suggestions,
+    loading: suggestionsLoading,
+    error: suggestionsError,
+    refresh: refreshSuggestions,
+  } = useTaskSuggestions();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [saving, setSaving] = useState(false);
@@ -27,10 +34,13 @@ export default function AddTaskScreen({ navigation }) {
     const e = {};
     if (!title.trim()) e.title = 'Title is required.';
     else if (title.trim().length < 3) e.title = 'Title must be at least 3 characters.';
-    if (description.trim() && description.trim().length < 10)
-      e.description = 'Description must be at least 10 characters if provided.';
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const applySuggestion = (suggestionTitle) => {
+    setTitle(suggestionTitle);
+    if (errors.title) setErrors((e) => ({ ...e, title: null }));
   };
 
   const handleSave = async () => {
@@ -99,8 +109,49 @@ export default function AddTaskScreen({ navigation }) {
           {errors.description ? <Text style={styles.errorText}>{errors.description}</Text> : null}
           <Text style={styles.charCount}>{description.length}/400</Text>
 
+          <View style={styles.suggestionsHeader}>
+            <Text style={styles.sectionLabel}>Ideas From Public API</Text>
+            <TouchableOpacity onPress={refreshSuggestions} disabled={suggestionsLoading}>
+              <Text style={[styles.refreshText, suggestionsLoading && styles.refreshTextDisabled]}>
+                Refresh
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.suggestionsBox}>
+            {suggestionsLoading ? (
+              <View style={styles.suggestionsState}>
+                <ActivityIndicator color={colors.primary} size="small" />
+                <Text style={styles.suggestionsStateText}>Loading suggestions...</Text>
+              </View>
+            ) : suggestionsError ? (
+              <View style={styles.suggestionsState}>
+                <Text style={styles.suggestionsStateText}>{suggestionsError}</Text>
+                <TouchableOpacity style={styles.retryBtn} onPress={refreshSuggestions}>
+                  <Text style={styles.retryText}>Try Again</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              suggestions.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.suggestion}
+                  onPress={() => applySuggestion(item.title)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.suggestionTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  <Text style={styles.suggestionMeta}>
+                    JSONPlaceholder todo #{item.id}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
+
           <View style={styles.hint}>
-            <Text style={styles.hintIcon}>💡</Text>
+            <Text style={styles.hintIcon}>i</Text>
             <Text style={styles.hintText}>
               New tasks start as "Not Completed". Toggle the status from the task list or detail view.
             </Text>
@@ -143,7 +194,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.xs,
     marginTop: spacing.md,
-    letterSpacing: 0.3,
   },
   inputWrap: {
     backgroundColor: colors.white,
@@ -181,6 +231,69 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 4,
   },
+  suggestionsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.md,
+  },
+  refreshText: {
+    ...typography.small,
+    color: colors.primary,
+    fontWeight: '700',
+    paddingHorizontal: spacing.xs,
+    paddingTop: spacing.md,
+  },
+  refreshTextDisabled: {
+    color: colors.textMuted,
+  },
+  suggestionsBox: {
+    backgroundColor: colors.white,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  suggestionsState: {
+    alignItems: 'center',
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  suggestionsStateText: {
+    ...typography.small,
+    color: colors.textLight,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  retryBtn: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  retryText: {
+    ...typography.small,
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  suggestion: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  suggestionTitle: {
+    ...typography.body,
+    color: colors.text,
+    fontWeight: '600',
+    lineHeight: 20,
+  },
+  suggestionMeta: {
+    ...typography.tiny,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
   hint: {
     flexDirection: 'row',
     backgroundColor: colors.primaryLight,
@@ -190,7 +303,15 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   hintIcon: {
-    fontSize: 14,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.primary,
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: '800',
+    lineHeight: 18,
+    textAlign: 'center',
   },
   hintText: {
     flex: 1,

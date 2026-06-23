@@ -15,7 +15,7 @@ export function useTasks() {
     loadTasks();
   }, []);
 
-  // GET — read all tasks from the JSON store
+  // GET - read all tasks from the JSON store
   const loadTasks = async () => {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -60,7 +60,7 @@ export function useTasks() {
     [tasks]
   );
 
-  // UPDATE — change any fields (title, description, status)
+  // UPDATE - change any fields (title, description, status)
   const updateTask = useCallback(
     async (id, changes) => {
       const updated = tasks.map((t) => (t.id === id ? { ...t, ...changes } : t));

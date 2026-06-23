@@ -5,7 +5,7 @@ import { colors, typography, spacing } from '../theme';
 export default function EmptyState({ icon, title, subtitle }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{icon || '📋'}</Text>
+      <Text style={styles.icon}>{icon || '+'}</Text>
       <Text style={styles.title}>{title || 'No tasks yet'}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>

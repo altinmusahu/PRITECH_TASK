@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -36,7 +36,10 @@ export default function TaskListScreen({ navigation }) {
     if (filter === STATUS.COMPLETED) list = list.filter((t) => t.status === STATUS.COMPLETED);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter((t) => t.title.toLowerCase().includes(q));
+      list = list.filter((t) => (
+        t.title.toLowerCase().includes(q)
+        || t.description.toLowerCase().includes(q)
+      ));
     }
     return list;
   }, [tasks, filter, search]);
@@ -53,10 +56,10 @@ export default function TaskListScreen({ navigation }) {
   };
 
   const emptyMessage = () => {
-    if (search.trim()) return { icon: '🔍', title: 'No results', subtitle: `No tasks match "${search}"` };
-    if (filter === STATUS.COMPLETED) return { icon: '✅', title: 'No completed tasks', subtitle: 'Mark a task as done and it will appear here.' };
-    if (filter === STATUS.NOT_COMPLETED) return { icon: '🎉', title: 'All done!', subtitle: 'You have no active tasks right now.' };
-    return { icon: '📋', title: 'No tasks yet', subtitle: 'Tap the + button to add your first task.' };
+    if (search.trim()) return { icon: '?', title: 'No results', subtitle: `No tasks match "${search}"` };
+    if (filter === STATUS.COMPLETED) return { icon: 'OK', title: 'No completed tasks', subtitle: 'Mark a task as done and it will appear here.' };
+    if (filter === STATUS.NOT_COMPLETED) return { icon: '*', title: 'All done!', subtitle: 'You have no active tasks right now.' };
+    return { icon: '+', title: 'No tasks yet', subtitle: 'Tap the + button to add your first task.' };
   };
 
   if (loading) {
@@ -77,7 +80,7 @@ export default function TaskListScreen({ navigation }) {
         <View>
           <Text style={styles.greeting}>My Tasks</Text>
           <Text style={styles.sub}>
-            {counts[STATUS.NOT_COMPLETED]} active · {counts[STATUS.COMPLETED]} completed
+            {counts[STATUS.NOT_COMPLETED]} active / {counts[STATUS.COMPLETED]} completed
           </Text>
         </View>
         <TouchableOpacity
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.lg,
   },
-  greeting: { fontSize: 26, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
+  greeting: { fontSize: 26, fontWeight: '800', color: colors.text },
   sub: { ...typography.small, color: colors.textLight, marginTop: 2 },
   addBtn: {
     width: 44,

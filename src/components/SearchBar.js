@@ -5,7 +5,6 @@ import { colors, radius, spacing, typography } from '../theme';
 export default function SearchBar({ value, onChangeText, onClear }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>🔍</Text>
       <TextInput
         style={styles.input}
         placeholder="Search tasks..."
@@ -18,7 +17,7 @@ export default function SearchBar({ value, onChangeText, onClear }) {
       />
       {value.length > 0 && (
         <TouchableOpacity onPress={onClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Text style={styles.clear}>✕</Text>
+          <Text style={styles.clear}>X</Text>
         </TouchableOpacity>
       )}
     </View>

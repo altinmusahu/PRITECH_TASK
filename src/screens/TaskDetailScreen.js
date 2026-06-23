@@ -94,16 +94,13 @@ export default function TaskDetailScreen({ route, navigation }) {
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-
-          {/* Status badge */}
           <View style={[styles.statusBanner, isCompleted ? styles.bannerDone : styles.bannerActive]}>
-            <Text style={[styles.statusDot, isCompleted ? styles.dotDone : styles.dotActive]}>●</Text>
+            <Text style={[styles.statusDot, isCompleted ? styles.dotDone : styles.dotActive]}>o</Text>
             <Text style={[styles.statusLabel, isCompleted ? styles.labelDone : styles.labelActive]}>
               {task.status}
             </Text>
           </View>
 
-          {/* Title */}
           {editing ? (
             <View style={[styles.inputWrap, titleError && styles.inputError]}>
               <TextInput
@@ -119,9 +116,8 @@ export default function TaskDetailScreen({ route, navigation }) {
           )}
           {titleError ? <Text style={styles.errorText}>{titleError}</Text> : null}
 
-          {/* Meta */}
           <View style={styles.metaRow}>
-            <Text style={styles.metaIcon}>📅</Text>
+            <Text style={styles.metaIcon}>#</Text>
             <View>
               <Text style={styles.metaLabel}>Created</Text>
               <Text style={styles.metaValue}>{createdAt}</Text>
@@ -131,7 +127,6 @@ export default function TaskDetailScreen({ route, navigation }) {
 
           <View style={styles.divider} />
 
-          {/* Description */}
           <Text style={styles.sectionLabel}>Description</Text>
           {editing ? (
             <View style={[styles.inputWrap, styles.textareaWrap]}>
@@ -155,7 +150,6 @@ export default function TaskDetailScreen({ route, navigation }) {
 
           <View style={styles.divider} />
 
-          {/* Actions */}
           <Text style={styles.sectionLabel}>Actions</Text>
 
           {editing ? (
@@ -169,7 +163,6 @@ export default function TaskDetailScreen({ route, navigation }) {
             </View>
           ) : (
             <TouchableOpacity style={[styles.actionBtn, styles.actionEdit]} onPress={startEdit} activeOpacity={0.85}>
-              <Text style={styles.actionIcon}>✏️</Text>
               <Text style={styles.actionText}>Edit Task</Text>
             </TouchableOpacity>
           )}
@@ -179,17 +172,14 @@ export default function TaskDetailScreen({ route, navigation }) {
             onPress={() => toggleStatus(task.id)}
             activeOpacity={0.85}
           >
-            <Text style={styles.actionIcon}>{isCompleted ? '↩' : '✓'}</Text>
             <Text style={styles.actionText}>
               {isCompleted ? `Mark as ${STATUS.NOT_COMPLETED}` : `Mark as ${STATUS.COMPLETED}`}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.actionBtn, styles.actionDelete]} onPress={handleDelete} activeOpacity={0.85}>
-            <Text style={styles.actionIcon}>🗑</Text>
             <Text style={[styles.actionText, { color: colors.danger }]}>Delete Task</Text>
           </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -223,7 +213,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '800',
     color: colors.text,
-    letterSpacing: -0.5,
     lineHeight: 30,
     marginBottom: spacing.lg,
   },
@@ -248,32 +237,44 @@ const styles = StyleSheet.create({
   errorText: { ...typography.tiny, color: colors.danger, marginBottom: spacing.sm },
   metaRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, marginBottom: spacing.md },
   metaIcon: { fontSize: 18, marginTop: 2 },
-  metaLabel: { ...typography.tiny, color: colors.textMuted, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+  metaLabel: { ...typography.tiny, color: colors.textMuted, fontWeight: '600', textTransform: 'uppercase' },
   metaValue: { ...typography.body, color: colors.text, fontWeight: '600', marginTop: 1 },
   metaTime: { ...typography.small, color: colors.textLight },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.lg },
-  sectionLabel: { ...typography.tiny, fontWeight: '700', color: colors.textMuted, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: spacing.sm },
+  sectionLabel: { ...typography.tiny, fontWeight: '700', color: colors.textMuted, textTransform: 'uppercase', marginBottom: spacing.sm },
   description: { ...typography.body, color: colors.text, lineHeight: 24 },
   noDesc: { ...typography.body, color: colors.textMuted, fontStyle: 'italic' },
   editRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.sm },
   cancelEditBtn: {
-    flex: 1, paddingVertical: 12, borderRadius: radius.lg, alignItems: 'center',
-    borderWidth: 1.5, borderColor: colors.border,
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: radius.lg,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: colors.border,
   },
   cancelEditText: { ...typography.body, fontWeight: '600', color: colors.textLight },
   saveEditBtn: {
-    flex: 2, paddingVertical: 12, borderRadius: radius.lg, alignItems: 'center',
+    flex: 2,
+    paddingVertical: 12,
+    borderRadius: radius.lg,
+    alignItems: 'center',
     backgroundColor: colors.primary,
   },
   saveEditText: { ...typography.body, fontWeight: '700', color: colors.white },
   actionBtn: {
-    flexDirection: 'row', alignItems: 'center', padding: spacing.md,
-    borderRadius: radius.lg, marginBottom: spacing.sm, gap: spacing.sm, borderWidth: 1.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
+    borderWidth: 1.5,
   },
   actionEdit: { backgroundColor: colors.surface, borderColor: colors.border },
   actionComplete: { backgroundColor: colors.successLight, borderColor: '#C3E6CB' },
   actionUndo: { backgroundColor: colors.primaryLight, borderColor: '#BDD3F0' },
   actionDelete: { backgroundColor: colors.dangerLight, borderColor: '#F5C6CB' },
-  actionIcon: { fontSize: 18, width: 24, textAlign: 'center' },
+  actionIcon: { fontSize: 14, width: 24, textAlign: 'center', fontWeight: '800' },
   actionText: { ...typography.body, fontWeight: '600', color: colors.text },
 });

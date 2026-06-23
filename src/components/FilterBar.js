@@ -1,8 +1,14 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { STATUS } from '../constants';
 import { colors, spacing, radius, typography } from '../theme';
 
-const FILTERS = ['All', 'Active', 'Completed'];
+const FILTERS = ['All', STATUS.NOT_COMPLETED, STATUS.COMPLETED];
+const LABELS = {
+  All: 'All',
+  [STATUS.NOT_COMPLETED]: 'Active',
+  [STATUS.COMPLETED]: 'Completed',
+};
 
 export default function FilterBar({ active, onChange, counts }) {
   return (
@@ -17,7 +23,7 @@ export default function FilterBar({ active, onChange, counts }) {
             activeOpacity={0.7}
           >
             <Text style={[styles.label, isActive && styles.labelActive]}>
-              {filter}
+              {LABELS[filter]}
             </Text>
             {counts[filter] !== undefined && (
               <View style={[styles.count, isActive && styles.countActive]}>
